@@ -155,7 +155,7 @@ def round_and_clip_image(image):
         for y in range(image['height']):
             color = get_pixel(image, x, y)
             if type(color) is not int:
-                set_pixel(result, x, y, round(color))
+                color = round(color)  # notice the if statement
             if color < 0:
                 set_pixel(result, x, y, 0)
             elif color > 255:
@@ -165,6 +165,15 @@ def round_and_clip_image(image):
     return result
 
 # FILTERS
+
+
+def box_k(n):
+    """
+    Kernel is a list. The kernel is an n\times nn×n square of identical values that sum to 1.
+    Output: [1/n**2, ...,]
+    """
+    i = 1/n**2
+    return [i for _ in range(n**2)]
 
 
 def blurred(image, n):
@@ -177,14 +186,15 @@ def blurred(image, n):
     """
     # first, create a representation for the appropriate n-by-n kernel (you may
     # wish to define another helper function for this)
-    raise NotImplementedError
+    k = box_k(n)
 
     # then compute the correlation of the input image with that kernel
-    raise NotImplementedError
+    corred = correlate(image, k)
 
     # and, finally, make sure that the output is a valid image (using the
     # helper function from above) before returning it.
-    raise NotImplementedError
+    result = round_and_clip_image(corred)
+    return result
 
 
 

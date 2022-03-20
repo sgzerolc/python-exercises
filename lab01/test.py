@@ -148,12 +148,26 @@ def test_blurred_images(kernsize, fname):
     compare_images(result, expected)
 
 def test_blurred_black_image():
-    # REPLACE THIS with your 1st test case from section 6.1
-    assert False
+    img = {'height': 6, 'width': 5, 'pixels': [0 for _ in range(30)]}
+    result1 = lab.blurred(img, 3)
+    result2 = lab.blurred(img, 5)
+    compare_images(img, result1)
+    compare_images(img, result2)
+
 
 def test_blurred_centered_pixel():
-    # REPLACE THIS with your 2nd test case from section 6.1
-    assert False
+    """
+    centered_pixel has 11*11 white blank and one black one in the center
+    """
+    input_img = lab.load_image("test_images/centered_pixel.png")
+    result = lab.blurred(input_img, 3)
+    print(result)
+    expected = {'height': input_img['height'], 'width': input_img['width'], 'pixels': [0 for _ in range(121)]}
+    r = [48, 49, 50, 59, 60, 61, 70, 71, 72]
+    for i in r:
+        expected['pixels'][i] = round(255/9)
+    print(expected)
+    compare_images(result, expected)
 
 @pytest.mark.parametrize("kernsize", [1, 3, 9])
 @pytest.mark.parametrize("fname", ['mushroom', 'twocats', 'chess'])
