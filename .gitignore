@@ -1,3 +1,5 @@
+# lab frugal map has large data.No need to track those.
+lab03_frugal_map/resources/
 # rm finder files
 .DS_Store
 # Byte-compiled / optimized / DLL files
