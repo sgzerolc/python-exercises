@@ -196,7 +196,51 @@ def blurred(image, n):
     result = round_and_clip_image(corred)
     return result
 
+def sharpened(image, n):
+    """
+    Return a new image representing the result of applying an unsharp mask
+    from a scaled version of the original image.
 
+    input: n denotes the size of the blur kernel
+    """
+    kernel = box_k(n)
+    corred = correlate(image, kernel)
+    result = {
+        'height': image['height'],
+        'width': image['width'],
+        'pixels': [0 for _ in range(image['height'] * image['width'])],
+    }
+
+    for x in range(image['width']):
+        for y in range(image['height']):
+            pix = 2*get_pixel(image, x, y) - get_pixel(corred, x, y)
+            set_pixel(result, x, y, pix);
+    result = round_and_clip_image(result)
+    return result
+
+def edges(image):
+    """
+    Return a new image representing the result of applying edge detector.
+    """
+    K_x = [-1, 0, 1,
+           -2, 0, 2,
+           -1, 0, 1]
+    K_y = [-1, -2, -1,
+           0, 0, 0,
+           1, 2, 1]
+    O_x = correlate(image, K_x)
+    O_y = correlate(image, K_y)
+    result = {
+        'height': image['height'],
+        'width': image['width'],
+        'pixels': [0 for _ in range(image['height'] * image['width'])],
+    }
+    for x in range(image['width']):
+        for y in range(image['height']):
+            pix = (get_pixel(O_x, x, y)**2 + get_pixel(O_y, x, y)**2)**(1/2)
+            set_pixel(result, x, y, pix)
+    result = round_and_clip_image(result)
+    return result
 
 # HELPER FUNCTIONS FOR LOADING AND SAVING IMAGES
 
