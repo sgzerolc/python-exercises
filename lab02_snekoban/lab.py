@@ -5,7 +5,6 @@ import typing
 
 # NO ADDITIONAL IMPORTS!
 
-
 direction_vector = {
     # trick you :)
     "up": (-1, 0),
@@ -39,7 +38,7 @@ def new_game(level_description):
     """
     row_j, col_i = len(level_description[0]), len(level_description)
     new_board = {}
-    new_board['target'], new_board['count_j_i'] = set(), (row_j, col_i)
+    new_board['target'], new_board['count_i_j'] = set(), (row_j, col_i)
     for j in range(row_j):
         for i in range(col_i):
             checkbox = level_description[i][j]
@@ -47,7 +46,7 @@ def new_game(level_description):
                 new_board['player'] = (i, j)
             if 'target' in checkbox:
                 new_board['target'].add((i, j))
-            new_board[(i, j)] = set(level_description[i][j])
+            new_board[(i, j)] = frozenset(level_description[i][j])
     return new_board
 
 
@@ -77,7 +76,12 @@ def step_game(game, direction):
     This function should not mutate its input.
     """
     # add_tuple using lambda
-    new_dict = dict(game)
+    new_dict = {'target': game['target'], 'count_i_j': game['count_i_j'],
+                'player': game['player']}
+    row_j, col_i = game['count_i_j']
+    for j in range(row_j):
+        for i in range(col_i):
+            new_dict[(i, j)] = set(game[(i, j)])
 
     # player's basic operations, assuming no other objects
     # set current loc and update next loc
@@ -109,8 +113,6 @@ def step_game(game, direction):
     # new_dict[old_loc] = set()
     new_dict['player'] = new_loc
 
-
-
     return new_dict
 
 
@@ -126,7 +128,7 @@ def dump_game(game):
     print out the current state of your game for testing and debugging on your
     own.
     """
-    row_j, col_i = game['count_j_i']
+    row_j, col_i = game['count_i_j']
     old_game = []
     for i in range(col_i):
         rows = []
@@ -145,8 +147,7 @@ def solve_puzzle(game):
 
     If the given level cannot be solved, return None.
     """
-    raise NotImplementedError
-
+    
 
 if __name__ == "__main__":
     # simple case: player's world
@@ -163,7 +164,9 @@ if __name__ == "__main__":
     new_pc_config = step_game(new_board, "up")
     assert(new_pc_config['player'] == (2, 1))
     assert(new_pc_config[(1, 1)] == {'computer'})
+    print(new_board)
     print(dump_game(new_board))
+    # assert(board == )
 
     # misc case
 

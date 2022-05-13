@@ -34,6 +34,7 @@ approach 1: borrowed from lab1's implementation: {location:state}
 approach 1.1?: using global variables to represent limited game states. -> redundant
 - changes: store player's location aside, {player:location}. Otherwise, we need to find the player's location everytime when needed.
   
+approach 2: use frozenset to support deep copy of dict
 
 
 

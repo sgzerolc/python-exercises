@@ -38,7 +38,7 @@ def compare_simulation(filename):
     if err_msg is not None:
         assert False, f"Unexpected results at setup: {err_msg}"
     for ix, (direction, (exp_dump, exp_win)) in enumerate(zip(inputs, outputs)):
-        original_game = copy.deepcopy(game)
+        original_game = copy.deepcopy(game)  # copy of new representation
         new_game = lab.step_game(game, direction)
         assert original_game == game, "be careful not to modify the input game!"
         game = new_game
