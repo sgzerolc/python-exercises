@@ -7,10 +7,15 @@ import typing
 
 
 direction_vector = {
+    # trick you :)
     "up": (-1, 0),
     "down": (+1, 0),
     "left": (0, -1),
     "right": (0, +1),
+    # "up": (0, -1),
+    # "down": (0, 1),
+    # "left": (-1, 0),
+    # "right": (1, 0),
 }
 
 
@@ -32,7 +37,18 @@ def new_game(level_description):
     The exact choice of representation is up to you; but note that what you
     return will be used as input to the other functions.
     """
-    raise NotImplementedError
+    row_j, col_i = len(level_description[0]), len(level_description)
+    new_board = {}
+    new_board['target'], new_board['count_j_i'] = set(), (row_j, col_i)
+    for j in range(row_j):
+        for i in range(col_i):
+            checkbox = level_description[i][j]
+            if 'player' in checkbox:   # store player's location(one-player game)
+                new_board['player'] = (i, j)
+            if 'target' in checkbox:
+                new_board['target'].add((i, j))
+            new_board[(i, j)] = set(level_description[i][j])
+    return new_board
 
 
 def victory_check(game):
@@ -41,8 +57,15 @@ def victory_check(game):
     a Boolean: True if the given game satisfies the victory condition, and
     False otherwise.
     """
-    raise NotImplementedError
+    if len(game['target']) == 0:
+        return False
+    for loc in game['target']:
+        if 'computer' not in game[loc]:
+            return False
+    return True
 
+def adder(x, y):
+    return (x[0]+y[0], x[1]+y[1])
 
 def step_game(game, direction):
     """
@@ -53,7 +76,43 @@ def step_game(game, direction):
 
     This function should not mutate its input.
     """
-    raise NotImplementedError
+    # add_tuple using lambda
+    new_dict = dict(game)
+
+    # player's basic operations, assuming no other objects
+    # set current loc and update next loc
+
+    old_loc = game['player']
+    new_loc = adder(old_loc, direction_vector[direction])
+
+    # wall's case: wall will not be moved
+    if 'wall' in game[new_loc]:
+        return game
+
+    # computer's case: pushing behavior
+    # pushing everywhere
+    if 'computer' in game[new_loc]:
+        new_pc_loc = adder(new_loc, direction_vector[direction])
+
+        # misc case: cannot be moved if there is wall or computer
+        if 'computer' in new_dict[new_pc_loc] or 'wall' in new_dict[new_pc_loc]:
+            return game
+
+        # move operation:
+        new_dict[new_pc_loc].add('computer')
+        new_dict[new_loc].remove('computer')
+
+    # general case: 1) player steps into target zone;
+    new_dict[new_loc].add('player')
+    # 2) player steps out target zone
+    new_dict[old_loc].remove('player')
+    # new_dict[old_loc] = set()
+    new_dict['player'] = new_loc
+
+
+
+    return new_dict
+
 
 
 def dump_game(game):
@@ -67,8 +126,14 @@ def dump_game(game):
     print out the current state of your game for testing and debugging on your
     own.
     """
-    raise NotImplementedError
-
+    row_j, col_i = game['count_j_i']
+    old_game = []
+    for i in range(col_i):
+        rows = []
+        for j in range(row_j):
+            rows.append(list(game[(i, j)]))
+        old_game.append(rows)
+    return old_game
 
 def solve_puzzle(game):
     """
@@ -84,4 +149,24 @@ def solve_puzzle(game):
 
 
 if __name__ == "__main__":
-    pass
+    # simple case: player's world
+    board = [
+        [['wall'], ['wall'], ['wall'], ['wall']],
+        [['wall'], [], ['wall'], ['wall']],
+        [['wall'], ['computer'], ['wall'], ['wall']],
+        [['wall'], ['player'], ['wall'], ['wall']],
+        [['wall'], ['wall'], ['wall'], ['wall']]
+    ]
+
+    # computer case
+    new_board = new_game(board)
+    new_pc_config = step_game(new_board, "up")
+    assert(new_pc_config['player'] == (2, 1))
+    assert(new_pc_config[(1, 1)] == {'computer'})
+    print(dump_game(new_board))
+
+    # misc case
+
+
+
+

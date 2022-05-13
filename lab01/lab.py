@@ -132,6 +132,7 @@ def correlate(image, kernel):
                 color = get_pixel(image, xi, yi)
                 cumulate += color * k[l]
             set_pixel(result, x, y, cumulate)
+
     return result
 
 def round_and_clip_image(image):
